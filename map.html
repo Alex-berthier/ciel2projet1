@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>Carte avec Leaflet</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        
+        <!-- Import de Leaflet -->
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+        <style>
+            #map {
+                height: 100vh; /* La carte prend toute la hauteur de la page */
+                width: 100%;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Carte des positions GPS</h1>
+        <div id="map"></div>
+
+        <script>
+            // Initialisation de la carte Leaflet
+            const map = L.map('map').setView([0, 0], 2); // Vue initiale centrée sur le monde
+
+            // Ajouter les tuiles de la carte
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+
+            // Fonction pour récupérer et afficher les données
+            async function fetchAndDisplayPositions() {
+                try {
+                    // Effectuer une requête POST vers le serveur
+                    const response = await fetch('http://192.168.64.132:3000/positions', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ uuid: '159' }) // UUID envoyé dans la requête
+                    });
+
+                    // Vérifier si la requête a réussi
+                    if (!response.ok) {
+                        throw new Error(`Erreur du serveur : ${response.status}`);
+                    }
+
+                    const data = await response.json();
+
+                    // Vérifier que des positions sont disponibles
+                    if (!data.positions || data.positions.length === 0) {
+                        console.warn('Aucune position reçue.');
+                        return;
+                    }
+
+                    // Ajouter des marqueurs pour chaque position
+                    data.positions.forEach((pos) => {
+                        const { latitude, longitude } = pos;
+                        L.marker([latitude, longitude])
+                            .addTo(map)
+                            .bindPopup(`Lat: ${latitude}, Lng: ${longitude}`)
+                            .openPopup();
+                    });
+
+                    // Ajuster la vue pour inclure tous les marqueurs
+                    const bounds = data.positions.map(pos => [pos.latitude, pos.longitude]);
+                    map.fitBounds(bounds);
+
+                } catch (error) {
+                    console.error('Erreur lors de la récupération des positions :', error);
+                }
+            }
+
+            // Charger les positions à l'ouverture de la page
+            window.onload = fetchAndDisplayPositions;
+        </script>
+    </body>
+</html>

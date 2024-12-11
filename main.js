@@ -8,7 +8,7 @@ button.addEventListener('click',function() {
 function appelApi(lelLgin, leMdp) {
     const data = { nom: lelLgin, prenom: leMdp };
 
-    const url = `http://${window.location.hostname}:3000/addUser`;
+    const url = `http://192.168.64.132:3000/addUser`;
 
 
     fetch(url, {
@@ -52,7 +52,7 @@ function appelApi(lelLgin, leMdp) {
 }
 
 // URL de l'API que vous souhaitez interroger
-const apiUrl = `http://${window.location.hostname}:3000`;
+const apiUrl = `http://192.168.64.132:3000`;
 
 // Utilisation de fetch() pour effectuer une requête GET
 fetch(apiUrl)
