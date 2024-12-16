@@ -1,0 +1,3 @@
+C:\Users\formation\source\repos\QtSerialCom\QtSerialCom\x64\Debug\QtSerialCom.exe
+C:\Users\formation\source\repos\GpsDecoder\QtSerialCom\x64\Debug\QtSerialCom.exe
+C:\Stockage perso\ciel2projet1\GpsDecoder\QtSerialCom\x64\Debug\QtSerialCom.exe

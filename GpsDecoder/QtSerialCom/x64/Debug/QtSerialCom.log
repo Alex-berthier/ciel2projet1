@@ -1,0 +1,7 @@
+﻿   Qt/MSBuild: 3.3.1.1
+   Qt: 5.14.2
+  QtSerialCom.cpp
+  qrc_QtSerialCom.cpp
+  moc_QtSerialCom.cpp
+  LINK : C:\Stockage perso\ciel2projet1\GpsDecoder\x64\Debug\QtSerialCom.exe introuvable ou non généré par la dernière édition de liens incrémentielle ; édition de liens complète en cours
+  QtSerialCom.vcxproj -> C:\Stockage perso\ciel2projet1\GpsDecoder\x64\Debug\QtSerialCom.exe
