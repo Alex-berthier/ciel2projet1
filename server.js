@@ -243,37 +243,35 @@ app.listen(port,'0.0.0.0' ,() => {
 
 
 app.post('/positions', async (req, res) => {
-  console.log("Requête position reçu" , req.body)
-  try {
-      // Vérifier si le corps de la requête contient un UUID
-      const { uuid } = req.body;
-      if (!uuid) {
-          return res.status(400).json({ error: 'UUID is missing from the request body' });
-      }
+  const { uuid } = req.body;
 
-      // Vérifier si l'UUID existe dans la table 'user'
-      const userQuery = 'SELECT COUNT(*) AS count FROM user WHERE uuid = ?';
-      const [userResult] = await db.query(userQuery, [uuid]);
-      
-      if (userResult.count === 0) {
-          return res.status(404).json({ error: 'UUID does not exist in the database' });
-      }
-
-      // Récupérer les 10 dernières positions GPS pour cet UUID
-      const gpsQuery = `
-          SELECT longitude, latitude
-          FROM gpsdata
-          WHERE uuid = ?
-          ORDER BY timestamp DESC
-          LIMIT 10
-      `;
-      const gpsData = await db.query(gpsQuery, [uuid]);
-
-      // Retourner les données GPS en JSON
-      return res.status(200).json({ positions: gpsData });
-  } catch (error) {
-      // Gérer les erreurs générales
-      console.error('Error handling /positions route:', error);
-      return res.status(500).json({ error: 'An internal server error occurred' });
+  // Vérifier si le uuid est présent dans le corps de la requête
+  if (!uuid) {
+    return res.status(400).json({ error: 'UUID manquant dans la requête' });
   }
+
+  // Vérifier si le uuid existe dans la table user
+  const userQuery = 'SELECT COUNT(*) AS count FROM user WHERE uuid = ?';
+  connection.query(userQuery, [uuid], (err, userResult) => {
+    if (err) {
+      console.error('Erreur lors de la vérification de l\'existence du uuid :', err);
+      return res.status(500).json({ error: 'Erreur interne du serveur' });
+    }
+
+    if (userResult[0].count === 0) {
+      return res.status(404).json({ error: 'UUID non trouvé dans la base de données' });
+    }
+
+    // Récupérer les données GPS de la table gpsdata
+    const gpsQuery = 'SELECT lattitude, longitude FROM gpsdata';
+    connection.query(gpsQuery, (err, gpsData) => {
+      if (err) {
+        console.error('Erreur lors de la récupération des données GPS :', err);
+        return res.status(500).json({ error: 'Erreur interne du serveur' });
+      }
+
+      // Renvoyer les données GPS vers le client
+      return res.status(200).json({ positions: gpsData });
+    });
+  });
 });
